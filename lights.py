@@ -5,14 +5,32 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 
-def pattern(outter_radius, inner_radius, n_circles,  n_lights):
+def pattern(outter_radius:float, inner_radius:float, n_circles:int,  n_lights:int):
     """
+        This function calculates the radius of multiple circles, as well as the distribution of [n] lights in each circle
+
+        Parameters
+        ----------
+            outter_radius: float
+                Radius of the larger circle to be used
+            inner_radius: float
+                Radius of the smallest circle to be used
+            n_circles: int
+                Number of circles including the largest and smallest ones
+            n_lights: int
+                Total number of lights to be distributed
+
+        Returns
+        -------
+            circles_radius: array_like
+                Array of the radius of each circle
+            n_lights_circle: array_like
+                Array with the number of lights included in each circle
     """
 
     # Calculate circles metrics
     circles_radius = np.linspace(inner_radius, outter_radius, n_circles)
     circles_weight = circles_radius / outter_radius
-    circles_index = np.arange(n_circles)
 
     sum_of_ratios = np.sum(circles_weight)
 
@@ -21,8 +39,8 @@ def pattern(outter_radius, inner_radius, n_circles,  n_lights):
 
     for c, weight in enumerate(circles_weight):
         # For the last circle, put all the remaining lights
-        if c == len(circles_weight):    
-            n_lights_circle[c] = n_lights - np.sum(n_lights_circle[:c-1])
+        if c == len(circles_weight)-1:    
+            n_lights_circle[c] = n_lights - np.sum(n_lights_circle[:c])
         
         # For all the inner circles, calculate the percentage of lights needed
         else:
@@ -30,9 +48,25 @@ def pattern(outter_radius, inner_radius, n_circles,  n_lights):
 
     return circles_radius, n_lights_circle
 
-def circles_plot(circles_radius, n_lights_circle, lights_dia, fig_size=(5,5)):
+def circles_plot(circles_radius:np.ndarray, n_lights_circle:np.ndarray, lights_dia:float, fig_size=(5,5)):
     """
         This function plots multiple circles with the lights overlaid
+
+        Parameters
+        ----------
+            circles_radius: array_like
+                Array with the radius of each circle
+            n_lights_circle
+                Array with the number of lights in each circle
+            lights_dia: float
+                Diameter of the lights
+            fig_size
+                Size of the figure. Specify in inches for template purposes
+
+        Returns
+        -------
+            fig: Figure object
+                Figure object from matplotlib
     """
 
     circles_origin = (0,0)  # Circles origin in cartesian (0,0) [cm]
@@ -59,6 +93,9 @@ def circles_plot(circles_radius, n_lights_circle, lights_dia, fig_size=(5,5)):
     return fig
 
 def polar2cart(r, theta):
+    """
+        This function converts from polar to cartesian planes
+    """
     x = r * np.cos(np.deg2rad(theta))
     y = r * np.sin(np.deg2rad(theta))
 
@@ -67,6 +104,9 @@ def polar2cart(r, theta):
     return cart
 
 def cart2polar(x,y):
+    """
+        This function converts from cartersian to polar planes
+    """
     r = x**2 + y**2
     theta_rad = np.arctan2(y,x)
     theta_deg = np.rad2deg(theta_rad)
